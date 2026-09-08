@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<title>そんな貴方に!</title>
+</head>
+<body>
+<main class="page page--answer">
+<section class="answerHero"><p class="answerHero__tagline">今夜くらい、飲んで忘れよう。</p></section>
+<section class="shop">
+<h2 class="shop__name">Bar BlueTemple</h2>
+
+    <div class="shop__photo shop__photo--compact" id="shopPhoto">
+      <img src="shop-photo.jpg" alt="Bar BlueTemple 店舗写真" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/shop-photo.jpg';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}">
+      <span class="shop__photo-placeholder" style="display:none;">店舗写真</span>
+    </div>
+
+<dl class="shop__info">
+<div class="shop__info-row"><dt>営業時間</dt><dd>18:00 〜 26:00(日祝休)</dd></div>
+<div class="shop__info-row"><dt>住所</dt><dd>【決まったら記載】</dd></div>
+</dl>
+<a class="priceButton" href="#">料金の確認</a>
+</section>
+<section class="routeSection"><p class="routeSection__title">お店までのルート</p>
+<a id="appleMapsButton" class="routeButton"
+       href="https://maps.apple.com/?saddr=%E5%B0%8F%E5%80%89%E9%A7%85%20%E7%A6%8F%E5%B2%A1%E7%9C%8C%E5%8C%97%E4%B9%9D%E5%B7%9E%E5%B8%82&daddr=%E3%80%92802-0004%20%E7%A6%8F%E5%B2%A1%E7%9C%8C%E5%8C%97%E4%B9%9D%E5%B7%9E%E5%B8%82%E5%B0%8F%E5%80%89%E5%8C%97%E5%8C%BA%E9%8D%9B%E5%86%B6%E7%94%BA1%E4%B8%81%E7%9B%AE6-9&dirflg=w"
+       target="_blank" rel="noopener noreferrer">iPhoneの方</a>
+<a id="googleMapsButton" class="routeButton"
+       href="https://www.google.com/maps/dir/?api=1&origin=%E5%B0%8F%E5%80%89%E9%A7%85%20%E7%A6%8F%E5%B2%A1%E7%9C%8C%E5%8C%97%E4%B9%9D%E5%B7%9E%E5%B8%82&destination=%E3%80%92802-0004%20%E7%A6%8F%E5%B2%A1%E7%9C%8C%E5%8C%97%E4%B9%9D%E5%B7%9E%E5%B8%82%E5%B0%8F%E5%80%89%E5%8C%97%E5%8C%BA%E9%8D%9B%E5%86%B6%E7%94%BA1%E4%B8%81%E7%9B%AE6-9&travelmode=walking"
+       target="_blank" rel="noopener noreferrer">Androidの方</a>
+</section>
+</main>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1310 @@
+/* =========================================================
+   BAR 立て看板QR ミニサイト / style.css
+   黄色 × 白 × 黒 / ポップ / シンプル / 少しシュール
+   ========================================================= */
+
+:root {
+  --yellow: #FFDD00;
+  --ink: #141414;
+  --white: #FFFFFF;
+  --shadow-ink: #141414;
+
+  --radius-btn: 22px;
+  --border-w: 3px;
+
+  /* Safe Area (iPhoneノッチ/ホームバー対応) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* 横スクロール禁止 */
+  background: var(--yellow);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: "M PLUS Rounded 1c", "Zen Maru Gothic", "Hiragino Sans",
+    "Noto Sans JP", sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* =========================================================
+   1ページ目: index.html
+   ========================================================= */
+
+.page--yes-no {
+  position: relative;
+  min-height: 100svh;
+  min-height: 100dvh;
+  min-height: 100vh; /* フォールバック */
+  background: var(--yellow);
+  overflow: hidden; /* NOボタンが逃げてもスクロールを発生させない */
+}
+
+.stage {
+  position: relative;
+  min-height: 100svh;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 8vh, 56px);
+  padding:
+    calc(var(--safe-top) + 32px)
+    calc(var(--safe-right) + 24px)
+    calc(var(--safe-bottom) + 32px)
+    calc(var(--safe-left) + 24px);
+}
+
+.copy {
+  margin: 0;
+  text-align: center;
+  font-weight: 900;
+  font-size: clamp(2.1rem, 8.6vw, 3.1rem);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  max-width: 11ch;
+}
+
+.buttonRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 6vw, 32px);
+  width: 100%;
+}
+
+/* YES / NO 共通ボタンスタイル */
+.choiceBtn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  width: clamp(120px, 32vw, 150px);
+  height: clamp(64px, 16vw, 78px);
+  border-radius: var(--radius-btn);
+  background: var(--white);
+  color: var(--ink);
+  border: var(--border-w) solid var(--ink);
+  box-shadow: 6px 6px 0 var(--shadow-ink);
+  font-weight: 800;
+  font-size: clamp(1.15rem, 4.6vw, 1.4rem);
+  letter-spacing: 0.06em;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.choiceBtn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 var(--shadow-ink);
+}
+
+/* NOボタンが「逃走モード」に入ったら fixed 配置に切り替える。
+   位置(left/top)は script.js から都度指定する */
+.choiceBtn--no.is-fleeing {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  transition:
+    left 0.24s cubic-bezier(0.19, 1, 0.22, 1),
+    top 0.24s cubic-bezier(0.19, 1, 0.22, 1),
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out;
+}
+
+/* YESを押した瞬間の白フェード演出 */
+.transitionOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--white);
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.38s ease-out;
+  z-index: 20;
+  padding: 0 24px;
+}
+
+.transitionOverlay.is-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.transitionText {
+  margin: 0;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 8vw, 2.6rem);
+  color: var(--ink);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  transition: opacity 0.36s ease-out 0.12s, transform 0.36s ease-out 0.12s;
+}
+
+.transitionOverlay.is-active .transitionText {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choiceBtn,
+  .choiceBtn--no.is-fleeing,
+  .transitionOverlay,
+  .transitionText {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =========================================================
+   2ページ目: answer.html
+   ========================================================= */
+
+.page--answer {
+  min-height: 100svh;
+  min-height: 100dvh;
+  min-height: 100vh;
+  background: var(--yellow);
+  padding:
+    calc(var(--safe-top) + 40px)
+    calc(var(--safe-right) + 22px)
+    calc(var(--safe-bottom) + 32px)
+    calc(var(--safe-left) + 22px);
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.answerHero {
+  text-align: center;
+}
+
+.answerHero__lead {
+  margin: 0 0 10px;
+  font-weight: 900;
+  font-size: clamp(2rem, 9vw, 2.6rem);
+  line-height: 1.2;
+}
+
+.answerHero__tagline {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(1rem, 4.4vw, 1.15rem);
+  color: var(--ink);
+  opacity: 0.85;
+}
+
+.shop {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 8px;
+  border-top: var(--border-w) solid var(--ink);
+}
+
+.shop__name {
+  margin: 18px 0 0;
+  font-size: clamp(1.5rem, 6.6vw, 1.9rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.shop__copy {
+  margin: 0;
+  font-family: "Zen Maru Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-weight: 500;
+  font-size: clamp(0.98rem, 4.2vw, 1.08rem);
+  line-height: 1.9;
+  color: var(--ink);
+}
+
+.shop__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  border: var(--border-w) solid var(--ink);
+  background: var(--ink);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shop__photo-placeholder {
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.shop__info {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shop__info-row {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 2px solid var(--ink);
+  align-items: baseline;
+}
+
+.shop__info-row dt {
+  flex: 0 0 auto;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: var(--ink);
+  color: var(--yellow);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.shop__info-row dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.routeSection {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.routeSection__title {
+  margin: 0 0 2px;
+  text-align: center;
+  font-weight: 900;
+  font-size: clamp(1rem, 4.4vw, 1.15rem);
+}
+
+.routeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 64px;
+  background: var(--ink);
+  color: var(--yellow);
+  text-decoration: none;
+  font-weight: 900;
+  font-size: clamp(1.02rem, 4.6vw, 1.15rem);
+  border-radius: var(--radius-btn);
+  border: var(--border-w) solid var(--ink);
+  box-shadow: 6px 6px 0 rgba(20, 20, 20, 0.35);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  letter-spacing: 0.03em;
+}
+
+.routeButton:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 rgba(20, 20, 20, 0.35);
+}
+
+
+/* YES後の押し出しテロップ */
+.transitionOverlay.is-active .transitionText{animation:telopPush .82s cubic-bezier(.22,1,.36,1) both}
+@keyframes telopPush{0%{opacity:0;transform:translateY(28px) scale(.96)}28%,68%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-34px) scale(1.02)}}
+.priceButton{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;background:var(--white);color:var(--ink);text-decoration:none;font-weight:900;font-size:clamp(1rem,4.4vw,1.12rem);border-radius:var(--radius-btn);border:var(--border-w) solid var(--ink);box-shadow:5px 5px 0 var(--shadow-ink);margin-top:4px}
+.priceButton:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--shadow-ink)}
+@media(prefers-reduced-motion:reduce){.transitionOverlay.is-active .transitionText{animation:none;opacity:1;transform:none}}
+
+
+/* =========================================================
+   YES後演出 v3
+   「そんな貴方に！」がこちらへ近づいて消え、
+   背景に店舗写真がゆっくり浮かぶ
+   ========================================================= */
+
+.transitionOverlay {
+  overflow: hidden;
+  background: var(--yellow);
+}
+
+.transitionPhoto {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 221, 0, 0.22), rgba(255, 221, 0, 0.22)),
+    url("assets/shop-photo.jpg") center center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.06);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.transitionOverlay.is-active .transitionPhoto {
+  animation: transitionPhotoReveal 1.65s ease-out both;
+}
+
+.transitionOverlay .transitionText {
+  position: relative;
+  z-index: 1;
+}
+
+.transitionOverlay.is-active .transitionText {
+  animation: transitionTextApproach 1.15s cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes transitionTextApproach {
+  0% {
+    opacity: 0;
+    transform: scale(.72);
+    filter: blur(2px);
+  }
+  22% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  58% {
+    opacity: 1;
+    transform: scale(1.22);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.15);
+    filter: blur(5px);
+  }
+}
+
+@keyframes transitionPhotoReveal {
+  0%, 45% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transitionOverlay.is-active .transitionText {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .transitionOverlay.is-active .transitionPhoto {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+/* =========================================================
+   PRO polish / compact answer + cinematic transition
+   既存トンマナ（黄・白・黒、丸み、太字）を維持
+   ========================================================= */
+
+/* ---------- YES後のシネマティック演出 ---------- */
+.transitionOverlay {
+  background: var(--yellow);
+  overflow: hidden;
+}
+
+.transitionOverlay::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,.24), transparent 34%),
+    linear-gradient(to bottom, rgba(0,0,0,.04), rgba(0,0,0,.12));
+  opacity: 0;
+  transform: scale(1.08);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.transitionPhoto {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(rgba(20,20,20,.16), rgba(20,20,20,.28)),
+    url("assets/shop-photo.jpg") center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.12);
+  filter: blur(7px) saturate(.92);
+  pointer-events: none;
+}
+
+.transitionOverlay.is-active .transitionPhoto {
+  animation: proPhotoReveal 2.85s cubic-bezier(.22,.8,.2,1) both;
+}
+
+.transitionOverlay.is-active::before {
+  animation: proLightReveal 2.85s ease-out both;
+}
+
+.transitionText {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .02em;
+  width: 100%;
+  margin: 0;
+  color: #fff;
+  text-align: center;
+  text-shadow:
+    0 3px 0 rgba(20,20,20,.95),
+    0 8px 20px rgba(0,0,0,.45);
+  will-change: transform, opacity, filter;
+}
+
+.transitionText__small {
+  display: block;
+  font-weight: 800;
+  font-size: clamp(1.2rem, 5.4vw, 1.7rem);
+  letter-spacing: .16em;
+}
+
+.transitionText__main {
+  display: block;
+  margin-top: -.06em;
+  font-weight: 900;
+  font-size: clamp(3rem, 15vw, 5.4rem);
+  line-height: .98;
+  letter-spacing: -.04em;
+  transform: skewX(-4deg);
+}
+
+.transitionOverlay.is-active .transitionText {
+  animation: proTextApproach 2.55s cubic-bezier(.18,.78,.18,1) both;
+}
+
+@keyframes proTextApproach {
+  0% {
+    opacity: 0;
+    transform: perspective(700px) translateZ(-180px) scale(.58);
+    filter: blur(8px);
+  }
+  18% {
+    opacity: 1;
+    transform: perspective(700px) translateZ(-40px) scale(.86);
+    filter: blur(1px);
+  }
+  45% {
+    opacity: 1;
+    transform: perspective(700px) translateZ(0) scale(1);
+    filter: blur(0);
+  }
+  67% {
+    opacity: 1;
+    transform: perspective(700px) translateZ(55px) scale(1.18);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(700px) translateZ(320px) scale(2.45);
+    filter: blur(7px);
+  }
+}
+
+@keyframes proPhotoReveal {
+  0%, 48% {
+    opacity: 0;
+    transform: scale(1.12);
+    filter: blur(7px) saturate(.92);
+  }
+  72% {
+    opacity: .56;
+    transform: scale(1.055);
+    filter: blur(3px) saturate(.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) saturate(1);
+  }
+}
+
+@keyframes proLightReveal {
+  0%, 52% { opacity: 0; transform: scale(1.08); }
+  78% { opacity: .55; }
+  100% { opacity: .18; transform: scale(1); }
+}
+
+/* ---------- 3枚目：1画面に収めやすい密度へ ---------- */
+.page--answer {
+  min-height: 100svh;
+  gap: 14px;
+  padding:
+    calc(var(--safe-top) + 18px)
+    calc(var(--safe-right) + 18px)
+    calc(var(--safe-bottom) + 16px)
+    calc(var(--safe-left) + 18px);
+}
+
+.answerHero {
+  margin: 0;
+}
+
+.answerHero__tagline {
+  font-size: clamp(.95rem, 4vw, 1.08rem);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.shop {
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.shop__name {
+  margin: 8px 0 0;
+  font-size: clamp(1.65rem, 7vw, 2.05rem);
+  line-height: 1.05;
+}
+
+.shop__photo--compact {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  min-height: 0;
+  border-radius: 16px;
+  margin: 2px 0 4px;
+}
+
+.shop__photo--compact img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shop__info {
+  gap: 0;
+}
+
+.shop__info-row {
+  padding: 9px 0;
+  gap: 12px;
+}
+
+.shop__info-row dt {
+  font-size: .78rem;
+  padding: 3px 9px;
+}
+
+.shop__info-row dd {
+  font-size: clamp(.85rem, 3.7vw, .96rem);
+}
+
+.priceButton {
+  min-height: 52px;
+  margin-top: 2px;
+  font-size: 1rem;
+}
+
+/* 料金とルートの間を大幅に詰める */
+.routeSection {
+  margin-top: 2px;
+  padding-top: 0;
+  gap: 8px;
+}
+
+.routeSection__title {
+  margin: 0;
+  font-size: clamp(.98rem, 4.2vw, 1.08rem);
+}
+
+.routeButton {
+  min-height: 54px;
+  font-size: clamp(.98rem, 4.2vw, 1.08rem);
+  border-radius: 18px;
+  box-shadow: 5px 5px 0 rgba(20,20,20,.32);
+}
+
+/* 小さめ端末ではさらに圧縮 */
+@media (max-height: 760px) {
+  .page--answer {
+    gap: 10px;
+    padding-top: calc(var(--safe-top) + 12px);
+    padding-bottom: calc(var(--safe-bottom) + 10px);
+  }
+
+  .answerHero__tagline {
+    font-size: .92rem;
+  }
+
+  .shop {
+    gap: 8px;
+  }
+
+  .shop__name {
+    font-size: 1.55rem;
+    margin-top: 4px;
+  }
+
+  .shop__photo--compact {
+    aspect-ratio: 16 / 6;
+  }
+
+  .shop__info-row {
+    padding: 7px 0;
+  }
+
+  .priceButton {
+    min-height: 46px;
+  }
+
+  .routeSection {
+    gap: 6px;
+  }
+
+  .routeButton {
+    min-height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transitionOverlay.is-active .transitionText,
+  .transitionOverlay.is-active .transitionPhoto,
+  .transitionOverlay.is-active::before {
+    animation: none !important;
+  }
+
+  .transitionOverlay.is-active .transitionText {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .transitionOverlay.is-active .transitionPhoto {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+
+/* =========================================================
+   PRO v2 spacing tune
+   「詰めすぎ」を解消しつつ、1画面に収まりやすいバランスへ
+   ========================================================= */
+
+.page--answer {
+  gap: 22px;
+  padding:
+    calc(var(--safe-top) + 24px)
+    calc(var(--safe-right) + 18px)
+    calc(var(--safe-bottom) + 22px)
+    calc(var(--safe-left) + 18px);
+}
+
+.answerHero {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.answerHero__tagline {
+  font-size: clamp(1rem, 4.2vw, 1.12rem);
+  line-height: 1.45;
+}
+
+.shop {
+  gap: 14px;
+  padding-top: 14px;
+}
+
+.shop__name {
+  margin-top: 10px;
+  margin-bottom: 2px;
+  font-size: clamp(1.75rem, 7.2vw, 2.15rem);
+}
+
+.shop__photo--compact {
+  aspect-ratio: 16 / 7.8;
+  margin: 4px 0 8px;
+}
+
+.shop__info-row {
+  padding: 11px 0;
+}
+
+.priceButton {
+  min-height: 56px;
+  margin-top: 4px;
+}
+
+.routeSection {
+  margin-top: 8px;
+  padding-top: 0;
+  gap: 10px;
+}
+
+.routeSection__title {
+  margin-bottom: 2px;
+  font-size: clamp(1rem, 4.4vw, 1.12rem);
+}
+
+.routeButton {
+  min-height: 56px;
+}
+
+/* 一般的なiPhone縦画面では少しだけ圧縮して1画面に収まりやすくする */
+@media (max-height: 850px) {
+  .page--answer {
+    gap: 17px;
+    padding-top: calc(var(--safe-top) + 18px);
+    padding-bottom: calc(var(--safe-bottom) + 16px);
+  }
+
+  .shop {
+    gap: 11px;
+  }
+
+  .shop__name {
+    margin-top: 6px;
+  }
+
+  .shop__photo--compact {
+    aspect-ratio: 16 / 7.1;
+    margin-bottom: 5px;
+  }
+
+  .shop__info-row {
+    padding: 9px 0;
+  }
+
+  .priceButton {
+    min-height: 52px;
+  }
+
+  .routeSection {
+    margin-top: 5px;
+    gap: 8px;
+  }
+
+  .routeButton {
+    min-height: 52px;
+  }
+}
+
+/* 小さめ端末だけ、必要最小限に圧縮 */
+@media (max-height: 730px) {
+  .page--answer {
+    gap: 12px;
+    padding-top: calc(var(--safe-top) + 12px);
+    padding-bottom: calc(var(--safe-bottom) + 10px);
+  }
+
+  .shop {
+    gap: 8px;
+  }
+
+  .shop__photo--compact {
+    aspect-ratio: 16 / 6.4;
+  }
+
+  .shop__info-row {
+    padding: 7px 0;
+  }
+
+  .priceButton {
+    min-height: 47px;
+  }
+
+  .routeSection {
+    margin-top: 2px;
+    gap: 6px;
+  }
+
+  .routeButton {
+    min-height: 48px;
+  }
+}
+
+
+/* =========================================================
+   PRO v3 / Premium cinematic transition
+   筆文字風＋金文字＋立体感＋店舗写真の余韻
+   ========================================================= */
+
+.transitionOverlay {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,.18), transparent 34%),
+    var(--yellow);
+}
+
+.transitionPhoto {
+  background:
+    linear-gradient(to bottom, rgba(8,8,8,.18), rgba(8,8,8,.34)),
+    url("assets/shop-photo.jpg") center center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.11);
+  filter: blur(8px) brightness(.72) saturate(.92);
+}
+
+.transitionOverlay.is-active .transitionPhoto {
+  animation: premiumPhotoReveal 4.0s cubic-bezier(.22,.8,.2,1) both;
+}
+
+.transitionText--premium {
+  position: relative;
+  z-index: 3;
+  width: min(92vw, 520px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+  transform-origin: center center;
+  will-change: transform, opacity, filter;
+}
+
+.transitionText__small,
+.transitionText__main {
+  font-family: "Yuji Syuku", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-style: normal;
+  line-height: .95;
+  background:
+    linear-gradient(
+      180deg,
+      #fff7bf 0%,
+      #ffe46b 18%,
+      #f4bc22 48%,
+      #fff0a0 68%,
+      #c68a00 100%
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1.4px rgba(55,33,0,.68);
+  filter:
+    drop-shadow(0 2px 0 rgba(255,255,255,.16))
+    drop-shadow(0 6px 0 rgba(80,44,0,.48))
+    drop-shadow(0 14px 20px rgba(0,0,0,.42));
+}
+
+.transitionText__small {
+  font-size: clamp(1.8rem, 8.5vw, 3rem);
+  letter-spacing: .10em;
+  transform: rotate(-4deg) translateX(-5%);
+}
+
+.transitionText__main {
+  margin-top: -.08em;
+  font-size: clamp(4.2rem, 20vw, 7rem);
+  letter-spacing: -.06em;
+  transform: skewX(-6deg) rotate(-2deg);
+}
+
+.transitionText__sweep {
+  display: block;
+  width: 78%;
+  height: 12px;
+  margin-top: .1rem;
+  border-radius: 999px 35% 70% 999px;
+  background:
+    linear-gradient(90deg, transparent 0%, #ffd93d 14%, #fff2a2 50%, #d49a00 86%, transparent 100%);
+  transform: rotate(-7deg) scaleX(0);
+  transform-origin: left center;
+  box-shadow:
+    0 0 12px rgba(255,213,40,.8),
+    0 0 28px rgba(255,190,0,.42);
+  opacity: 0;
+}
+
+.transitionOverlay.is-active .transitionText--premium {
+  animation: premiumTextRush 3.05s cubic-bezier(.16,.78,.18,1) both;
+}
+
+.transitionOverlay.is-active .transitionText__sweep {
+  animation: premiumSweep 2.3s ease-out .48s both;
+}
+
+.transitionOverlay.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 48% 42%, rgba(255,230,120,.26), transparent 12%),
+    radial-gradient(circle at 58% 52%, rgba(255,196,40,.18), transparent 17%);
+  animation: premiumGlow 3.25s ease-out both;
+}
+
+@keyframes premiumTextRush {
+  0% {
+    opacity: 0;
+    transform: perspective(850px) translateZ(-280px) scale(.48) rotate(-1.5deg);
+    filter: blur(10px);
+  }
+  16% {
+    opacity: .7;
+    transform: perspective(850px) translateZ(-120px) scale(.68) rotate(-1deg);
+    filter: blur(4px);
+  }
+  34% {
+    opacity: 1;
+    transform: perspective(850px) translateZ(-20px) scale(.92) rotate(-.5deg);
+    filter: blur(0);
+  }
+  55% {
+    opacity: 1;
+    transform: perspective(850px) translateZ(36px) scale(1.08);
+    filter: blur(0);
+  }
+  72% {
+    opacity: 1;
+    transform: perspective(850px) translateZ(110px) scale(1.34);
+    filter: blur(.5px);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(850px) translateZ(430px) scale(2.8);
+    filter: blur(8px);
+  }
+}
+
+@keyframes premiumSweep {
+  0% {
+    opacity: 0;
+    transform: rotate(-7deg) scaleX(0);
+  }
+  28% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+    transform: rotate(-7deg) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-7deg) scaleX(1.12);
+  }
+}
+
+@keyframes premiumPhotoReveal {
+  0%, 52% {
+    opacity: 0;
+    transform: scale(1.11);
+    filter: blur(8px) brightness(.72) saturate(.92);
+  }
+  68% {
+    opacity: .38;
+    transform: scale(1.07);
+    filter: blur(5px) brightness(.76) saturate(.95);
+  }
+  84% {
+    opacity: .82;
+    transform: scale(1.025);
+    filter: blur(1.5px) brightness(.82) saturate(.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(.88) saturate(1);
+  }
+}
+
+@keyframes premiumGlow {
+  0%, 22% { opacity: 0; }
+  44% { opacity: .7; }
+  72% { opacity: .42; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transitionOverlay.is-active .transitionText--premium,
+  .transitionOverlay.is-active .transitionText__sweep,
+  .transitionOverlay.is-active .transitionPhoto,
+  .transitionOverlay.is-active::after {
+    animation: none !important;
+  }
+
+  .transitionOverlay.is-active .transitionText--premium {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .transitionOverlay.is-active .transitionText__sweep {
+    opacity: 1;
+    transform: rotate(-7deg) scaleX(1);
+  }
+
+  .transitionOverlay.is-active .transitionPhoto {
+    opacity: 1;
+    transform: none;
+    filter: brightness(.88);
+  }
+}
+
+
+/* =========================================================
+   PRO v4 / iPhone Safari 安定版 + root画像対応
+   shop-photo.jpg は index.html と同じ階層を優先。
+   無ければ assets/shop-photo.jpg に自動フォールバック。
+   ========================================================= */
+
+:root {
+  --shop-photo-url: url("shop-photo.jpg");
+}
+
+/* 金色の謎の棒は完全非表示 */
+.transitionText__sweep {
+  display: none !important;
+}
+
+/* テロップ：白〜金の筆文字。Safariで黒潰れしにくい実色方式 */
+.transitionText--premium {
+  width: min(92vw, 540px);
+  filter: none;
+}
+
+.transitionText__small,
+.transitionText__main {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+.transitionText__small {
+  font-family: "Yuji Syuku", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(1.7rem, 8vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #fffaf0 !important;
+  -webkit-text-fill-color: #fffaf0 !important;
+  transform: rotate(-3deg) translateX(-7%);
+  text-shadow:
+    0 3px 0 rgba(89, 52, 0, .35),
+    0 10px 24px rgba(0, 0, 0, .28);
+}
+
+.transitionText__main {
+  font-family: "Yuji Syuku", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(4.35rem, 20vw, 7.25rem);
+  font-weight: 900;
+  letter-spacing: -.055em;
+  color: #f4c64a !important;
+  -webkit-text-fill-color: #f4c64a !important;
+  transform: skewX(-5deg) rotate(-2deg);
+  text-shadow:
+    0 2px 0 #fff4ba,
+    0 5px 0 #b97d0d,
+    0 12px 24px rgba(0, 0, 0, .34),
+    0 0 20px rgba(255, 202, 68, .22);
+}
+
+/* 店舗写真はrootのshop-photo.jpgを優先。JSでfallback可 */
+.transitionPhoto {
+  background:
+    linear-gradient(to bottom, rgba(8,8,8,.16), rgba(8,8,8,.30)),
+    var(--shop-photo-url) center center / cover no-repeat !important;
+}
+
+/* テロップを自然に見せてから迫らせる */
+.transitionOverlay.is-active .transitionText--premium {
+  animation: premiumTextRushV4 3.35s cubic-bezier(.16,.78,.18,1) both !important;
+}
+
+@keyframes premiumTextRushV4 {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) translateZ(-240px) scale(.52);
+    filter: blur(7px);
+  }
+  18% {
+    opacity: 1;
+    transform: perspective(900px) translateZ(-85px) scale(.78);
+    filter: blur(2px);
+  }
+  40% {
+    opacity: 1;
+    transform: perspective(900px) translateZ(0) scale(1);
+    filter: blur(0);
+  }
+  65% {
+    opacity: 1;
+    transform: perspective(900px) translateZ(60px) scale(1.16);
+    filter: blur(0);
+  }
+  82% {
+    opacity: 1;
+    transform: perspective(900px) translateZ(155px) scale(1.42);
+    filter: blur(.3px);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(900px) translateZ(430px) scale(2.55);
+    filter: blur(6px);
+  }
+}
+
+/* 文字が消える頃から写真をゆっくり見せる */
+.transitionOverlay.is-active .transitionPhoto {
+  animation: premiumPhotoRevealV4 4.65s ease-out both !important;
+}
+
+@keyframes premiumPhotoRevealV4 {
+  0%, 58% {
+    opacity: 0;
+    transform: scale(1.10);
+    filter: blur(7px) brightness(.70) saturate(.92);
+  }
+  74% {
+    opacity: .42;
+    transform: scale(1.06);
+    filter: blur(4px) brightness(.76) saturate(.96);
+  }
+  88% {
+    opacity: .84;
+    transform: scale(1.025);
+    filter: blur(1px) brightness(.84) saturate(.99);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(.90) saturate(1);
+  }
+}
+
+
+/* =========================================================
+   PRO v5 / 「そんな貴方に！」画像ロゴ版
+   CSS文字表現の限界を避け、支給画像をそのままアニメーション
+   ========================================================= */
+
+.transitionText--image {
+  width: min(92vw, 620px) !important;
+  max-width: 92vw;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+}
+
+.transitionLogo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 8px 0 rgba(0,0,0,.24))
+    drop-shadow(0 16px 26px rgba(0,0,0,.34));
+  transform: translateZ(0);
+  will-change: transform, opacity, filter;
+}
+
+/* 旧テキスト要素は使用しない */
+.transitionText--image .transitionText__small,
+.transitionText--image .transitionText__main,
+.transitionText--image .transitionText__sweep {
+  display: none !important;
+}
+
+/* 画像ロゴを奥から近づけ、最後は画面いっぱいへ抜く */
+.transitionOverlay.is-active .transitionText--image {
+  animation: logoRushV5 3.55s cubic-bezier(.16,.78,.18,1) both !important;
+}
+
+@keyframes logoRushV5 {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) translateZ(-300px) scale(.46);
+    filter: blur(9px);
+  }
+  18% {
+    opacity: .92;
+    transform: perspective(1000px) translateZ(-120px) scale(.68);
+    filter: blur(3px);
+  }
+  38% {
+    opacity: 1;
+    transform: perspective(1000px) translateZ(-15px) scale(.92);
+    filter: blur(0);
+  }
+  58% {
+    opacity: 1;
+    transform: perspective(1000px) translateZ(45px) scale(1.08);
+    filter: blur(0);
+  }
+  76% {
+    opacity: 1;
+    transform: perspective(1000px) translateZ(125px) scale(1.34);
+    filter: blur(.3px);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(1000px) translateZ(470px) scale(2.65);
+    filter: blur(7px);
+  }
+}
+
+/* ロゴが抜けた後に店舗写真をゆっくり見せる */
+.transitionOverlay.is-active .transitionPhoto {
+  animation: photoAfterLogoV5 5.15s ease-out both !important;
+}
+
+@keyframes photoAfterLogoV5 {
+  0%, 57% {
+    opacity: 0;
+    transform: scale(1.11);
+    filter: blur(8px) brightness(.70) saturate(.92);
+  }
+  72% {
+    opacity: .38;
+    transform: scale(1.065);
+    filter: blur(5px) brightness(.76) saturate(.96);
+  }
+  86% {
+    opacity: .82;
+    transform: scale(1.025);
+    filter: blur(1.5px) brightness(.84) saturate(.99);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(.91) saturate(1);
+  }
+}
